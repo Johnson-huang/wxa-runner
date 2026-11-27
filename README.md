@@ -4,10 +4,36 @@
 
 **[文档](https://open-wxa.github.io/wxa-runner/)** · [在线预览](https://wxa-viewer.picfinder.workers.dev) · [English](./README.en.md) · 中文 · [日本語](./README.ja.md)
 
+## 快速开始
+
+### npx 启动
+
+> 暂时可用但是已被腾讯封禁，后续不维护。
+
 ```bash
 npx wxa-runner dev ./dist/dev/mp-weixin   # 原生小程序目录，或 uni-app / Taro 编译产物
 # → http://localhost:3000
 ```
+
+### 从本地源码启动
+
+无法通过 npm/npx 获取或执行 `wxa-runner` 时，可以克隆本仓库，直接使用本地源码中的 CLI。下面的 `/path/to/...` 需要替换成本机的实际绝对路径。
+
+```bash
+# 1. 首次使用：在 wxa-runner 源码目录安装依赖并构建
+cd /path/to/wxa-runner
+pnpm install --frozen-lockfile
+pnpm build
+
+# 2. 之后在 project.config.json 所在的小程序目录启动
+cd /path/to/miniprogram
+node /path/to/wxa-runner/packages/cli/bin/wxa-runner.js dev . --open
+# → http://localhost:3000
+```
+
+uni-app、Taro 等项目把项目目录换成框架的编译产物目录，例如
+`node /path/to/wxa-runner/packages/cli/bin/wxa-runner.js dev ./dist/dev/mp-weixin --open`。
+完整的本地启动、命令封装和更新方式见[快速开始](https://open-wxa.github.io/wxa-runner/getting-started#从本地源码启动)。
 
 [在线预览](https://wxa-viewer.picfinder.workers.dev)：不用安装，在浏览器里打开一个 uni-app 小程序，看它在 web 上的渲染效果。
 演示用[查看器](https://open-wxa.github.io/wxa-runner/viewer)部署，接口都由 setup 用 mock 数据应答，投票、评论、发帖都能操作，刷新后恢复原样。

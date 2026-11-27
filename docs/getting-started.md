@@ -1,5 +1,5 @@
 ---
-description: 一行命令在浏览器里运行微信小程序：原生小程序、uni-app、Taro 编译产物的启动方式，以及怎么用 Chrome DevTools 打断点、看请求、看页面结构。
+description: 从本地 wxa-runner 源码在浏览器里运行微信小程序：首次构建、启动原生小程序和 uni-app、Taro 编译产物，以及怎么用 Chrome DevTools 打断点、看请求、看页面结构。
 ---
 
 # 快速开始
@@ -8,12 +8,79 @@ wxa-runner 在 Chrome 里用微信官方基础库运行小程序。需要 Node.j
 
 ## 启动
 
+### npx 启动
+
+> 暂时可用但是已被腾讯封禁，后续不维护。
+
+原生小程序在 `project.config.json` 所在目录运行：
+
+```bash
+npx wxa-runner dev . --open
+```
+
+uni-app、Taro 等项目传入编译产物目录，例如：
+
+```bash
+npx wxa-runner dev ./dist/dev/mp-weixin --open
+```
+
+### 从本地源码启动
+
+推荐直接使用克隆到本机的源码。下面的 `/path/to/...` 都需要替换成实际绝对路径。
+
+首次使用时，先进入 wxa-runner 源码目录安装依赖并构建：
+
+```bash
+cd /path/to/wxa-runner
+pnpm install --frozen-lockfile
+pnpm build
+```
+
+构建会生成本地 `core`、`compiler`、`extractor` 等包需要的文件，并让 workspace 内的依赖指向这些本地包。通常只需要在首次使用和更新源码后执行。
+
+然后进入小程序项目继续启动。原生小程序的目录就是 `project.config.json` 所在目录：
+
+```bash
+cd /path/to/miniprogram
+node /path/to/wxa-runner/packages/cli/bin/wxa-runner.js dev . --open
+```
+
+uni-app、Taro 等项目改为传入编译产物目录：
+
+```bash
+cd /path/to/miniprogram
+node /path/to/wxa-runner/packages/cli/bin/wxa-runner.js dev ./dist/dev/mp-weixin --open
+```
+
+如果经常在多个项目里使用，可以在 `~/.zshrc` 或 `~/.bashrc` 里封装成命令，之后用 `wxa-local` 代替 `wxa-runner`：
+
+```bash
+wxa-local() {
+  node /path/to/wxa-runner/packages/cli/bin/wxa-runner.js "$@"
+}
+```
+
+重新加载 shell 配置后，原来的启动命令可以写成：
+
+```bash
+wxa-local dev . --open
+```
+
+更新 wxa-runner 源码后，需要回到源码目录重新构建：
+
+```bash
+cd /path/to/wxa-runner
+git pull
+pnpm install --frozen-lockfile
+pnpm build
+```
+
 ### 原生小程序
 
 在 `project.config.json` 所在目录运行：
 
 ```bash
-npx wxa-runner dev . --open
+wxa-local dev . --open
 ```
 
 ### uni-app
@@ -41,15 +108,15 @@ export default defineConfig({
 <summary>不用插件：两个终端分别启动</summary>
 
 ```bash
-npm run dev:mp-weixin                            # 终端 1
-npx wxa-runner dev ./dist/dev/mp-weixin --open   # 终端 2
+npm run dev:mp-weixin                         # 终端 1
+wxa-local dev ./dist/dev/mp-weixin --open     # 终端 2
 ```
 
 HBuilderX 创建的项目，产物在 `unpackage/dist/dev/mp-weixin`。
 
 </details>
 
-Taro 等其他框架：先跑框架的监听构建，再用 `npx wxa-runner dev <编译产物目录>` 启动。
+Taro 等其他框架：先跑框架的监听构建，再用 `wxa-local dev <编译产物目录>` 启动。
 
 ---
 
@@ -57,7 +124,7 @@ Taro 等其他框架：先跑框架的监听构建，再用 `npx wxa-runner dev 
 
 - 直接打开某一页：`http://localhost:3000/?path=pages/detail/detail&id=1`
 - 跳过登录：见[启动前准备（setup）](./setup.md)
-- 长期使用或在 CI 里跑：装成开发依赖 `pnpm add -D wxa-runner`
+- 每次都调用完整路径：把上面的 `wxa-local` 换成 `node /path/to/wxa-runner/packages/cli/bin/wxa-runner.js`
 
 ## 调试
 
